@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────
+# Environment files — never commit secrets
+# ─────────────────────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ─────────────────────────────────────────
+# Node / npm
+# ─────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─────────────────────────────────────────
+# Next.js (dashboard)
+# ─────────────────────────────────────────
+dashboard/.next/
+dashboard/out/
+dashboard/.vercel/
+
+# ─────────────────────────────────────────
+# Build outputs
+# ─────────────────────────────────────────
+dist/
+build/
+
+# ─────────────────────────────────────────
+# OS / editor
+# ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# ─────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────
+logs/
+*.log
+
+# ─────────────────────────────────────────
+# n8n exports (keep exports, ignore local instance data)
+# ─────────────────────────────────────────
+workflows/.n8n/
+
+# ─────────────────────────────────────────
+# Google OAuth tokens (stored locally at runtime)
+# ─────────────────────────────────────────
+**/token.json
+**/credentials.json
