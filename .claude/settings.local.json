@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/f/Program Files/PostgreSQL/18/bin/psql\" --version)",
+      "Bash(\"/f/Program Files/PostgreSQL/18/bin/psql\" -U postgres -c \"CREATE DATABASE voice_booking;\")",
+      "Bash(\"/f/Program Files/PostgreSQL/18/bin/pg_ctl\" start -D \"/f/Program Files/PostgreSQL/18/data\")",
+      "Read(//f/Program Files/PostgreSQL/18/data/log//**)",
+      "Read(//f/Program Files/PostgreSQL/18/data/log/$\\(ls -t '/f/Program Files/PostgreSQL/18/data/**)",
+      "Bash(\"/f/Program Files/PostgreSQL/18/bin/psql\" -U postgres -p 5433 -c \"\\\\l\")",
+      "Bash(\"/f/Program Files/PostgreSQL/18/bin/psql\" -U postgres -p 5433 -c \"SELECT version\\(\\);\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(netstat -ano)",
+      "Bash(tasklist)",
+      "Bash(PGPASSWORD=postgres \"/f/Program Files/PostgreSQL/18/bin/psql\" -U postgres -p 5432 -c \"SELECT version\\(\\);\")",
+      "Bash(PGPASSWORD=admin PGSSLMODE=disable \"/f/Program Files/PostgreSQL/18/bin/psql\" -U postgres -p 5432 -h 127.0.0.1 -c \"SELECT version\\(\\);\")",
+      "Bash(net stop:*)",
+      "Bash(sc stop:*)"
+    ]
+  }
+}
