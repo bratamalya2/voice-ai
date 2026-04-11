@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"f:\\\\Hirok\\\\Projects\\\\Voice Booking Agent\\\\backend\")",
+      "Bash(npm install:*)",
+      "Bash(node src/index.js)",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(curl -s -X POST http://localhost:3001/webhook/twilio -d 'CallSid=CAtest123&From=%2B61400000001&To=%2B15754194924&CallStatus=ringing')",
+      "Bash(node -e ':*)",
+      "Bash(curl -s -X POST http://localhost:3001/webhook/twilio -H 'X-Skip-Validation: true' -d 'CallSid=CAtest123&From=%2B61400000001&To=%2B15754194924&CallStatus=ringing')",
+      "Bash(pkill -f \"node src/index.js\")",
+      "Bash(TWILIO_WEBHOOK_VALIDATION=false node src/index.js)",
+      "Bash(curl -s -X POST http://localhost:3001/webhook/twilio -d 'CallSid=CAtest456&From=%2B61400000001&To=%2B15754194924&CallStatus=ringing')"
+    ],
+    "additionalDirectories": [
+      "F:\\Hirok\\Projects\\Voice Booking Agent"
+    ]
+  }
+}

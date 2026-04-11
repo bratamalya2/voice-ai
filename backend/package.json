@@ -1,0 +1,19 @@
+{
+  "name": "voice-booking-backend",
+  "version": "1.0.0",
+  "description": "Backend API and Twilio webhook handler for the AI Voice Booking system",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "twilio": "^5.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

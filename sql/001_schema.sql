@@ -195,12 +195,12 @@ INSERT INTO businesses (
 );
 
 -- Services for Shine Mobile Detailing
-INSERT INTO services (business_id, keypad_option, service_code, name_en, name_hi, name_zh, duration_minutes, base_price_min, base_price_max) VALUES
-    ('11111111-1111-1111-1111-111111111111', 1, 'EXT_WASH',      'Exterior Wash',         'बाहरी धुलाई',        '外部清洗',    60,   80.00,  120.00),
-    ('11111111-1111-1111-1111-111111111111', 2, 'INT_DETAIL',    'Interior Detail',       'आंतरिक डिटेलिंग',   '内部细节',    90,  120.00,  180.00),
-    ('11111111-1111-1111-1111-111111111111', 3, 'FULL_DETAIL',   'Full Detail',           'पूर्ण डिटेलिंग',    '全面细节',   180,  250.00,  400.00),
-    ('11111111-1111-1111-1111-111111111111', 4, 'PRESALE_DETAIL','Pre-Sale Detail',       'बिक्री पूर्व',       '售前细节',   240,  350.00,  500.00),
-    ('11111111-1111-1111-1111-111111111111', 5, 'CERAMIC',       'Ceramic Coating Enquiry','सिरेमिक कोटिंग',  '陶瓷涂层',     60,    0.00,    0.00, TRUE);
+INSERT INTO services (business_id, keypad_option, service_code, name_en, name_hi, name_zh, duration_minutes, base_price_min, base_price_max, manual_review_required) VALUES
+    ('11111111-1111-1111-1111-111111111111', 1, 'EXT_WASH',      'Exterior Wash',          'बाहरी धुलाई',       '外部清洗',   60,   80.00,  120.00, FALSE),
+    ('11111111-1111-1111-1111-111111111111', 2, 'INT_DETAIL',    'Interior Detail',        'आंतरिक डिटेलिंग',  '内部细节',   90,  120.00,  180.00, FALSE),
+    ('11111111-1111-1111-1111-111111111111', 3, 'FULL_DETAIL',   'Full Detail',            'पूर्ण डिटेलिंग',   '全面细节',  180,  250.00,  400.00, FALSE),
+    ('11111111-1111-1111-1111-111111111111', 4, 'PRESALE_DETAIL','Pre-Sale Detail',        'बिक्री पूर्व',      '售前细节',  240,  350.00,  500.00, FALSE),
+    ('11111111-1111-1111-1111-111111111111', 5, 'CERAMIC',       'Ceramic Coating Enquiry','सिरेमिक कोटिंग',   '陶瓷涂层',   60,    0.00,    0.00, TRUE);
 
 -- Availability rules for Shine Mobile Detailing (Mon–Sat, 8 AM – 5 PM)
 INSERT INTO availability_rules (business_id, weekday, start_time, end_time, slot_minutes) VALUES
