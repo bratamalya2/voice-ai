@@ -2,7 +2,7 @@
 
 > Blueprint: `Voice Booking Agent Blueprint.pdf`
 > Implementation guide: `ai_voice_booking_implementation_guide.pdf`
-> Last reviewed: 2026-04-11
+> Last reviewed: 2026-04-14
 
 Legend: ✅ Implemented · ⬜ Not started
 
@@ -38,10 +38,10 @@ Legend: ✅ Implemented · ⬜ Not started
 | 1.18a | Schema applied to Render PostgreSQL database | ✅ | Live on `singapore-postgres.render.com` |
 
 ### n8n Setup
-| # | Feature | Status |
-|---|---------|--------|
-| 1.19 | n8n running locally or on test server | ⬜ |
-| 1.20 | Hello-world webhook workflow | ⬜ |
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 1.19 | n8n running on server | ✅ | Deployed on Render — `n8n-uz06.onrender.com` |
+| 1.20 | Hello-world webhook workflow created and tested | ✅ | POST `/webhook/test` verified in production mode |
 | 1.21 | Test vs production URL strategy documented | ✅ | In `docs/architecture.md` — webhook URL strategy section |
 
 ### Twilio Setup
@@ -64,33 +64,34 @@ Legend: ✅ Implemented · ⬜ Not started
 | B3 | Twilio signature validation middleware | ✅ | `backend/src/middleware/twilioValidation.js` |
 | B4 | IVR call router (`backend/src/routes/twilio.js`) | ✅ | Stateful — reads/writes `calls` table |
 | B5 | `/health` endpoint verified against live Render DB | ✅ | Returns `{"status":"ok","db_time":"..."}` |
+| B6 | Google OAuth flow (`/auth/google` + `/auth/google/callback`) | ✅ | `backend/src/routes/auth.js` — used to obtain refresh token |
 
 ---
 
 ## Week 2 — Quote Engine, Availability Engine & Core Logic
 
 ### Quote Engine
-| # | Feature | Status |
-|---|---------|--------|
-| 2.1 | Car detailing quote rules (service type, vehicle type, condition, add-ons, suburb/travel fee) | ⬜ |
-| 2.2 | Cleaning quote rules (service type, property type, bedrooms, bathrooms, extras, suburb/travel fee, frequency) | ⬜ |
-| 2.3 | Returns `quote_min`, `quote_max`, and `manual_review` flag | ⬜ |
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 2.1 | Car detailing quote rules (service type, vehicle type, condition, add-ons, suburb/travel fee) | ✅ | n8n `quote-engine` workflow — Code node |
+| 2.2 | Cleaning quote rules (service type, property type, bedrooms, bathrooms, extras, suburb/travel fee, frequency) | ✅ | n8n `quote-engine` workflow — Code node |
+| 2.3 | Returns `quote_min`, `quote_max`, and `manual_review` flag | ✅ | Tested: car detailing $410–$608, cleaning $320–$500 |
 
 ### Availability Engine
-| # | Feature | Status |
-|---|---------|--------|
-| 2.4 | Google Calendar OAuth credentials created and connected | ⬜ |
-| 2.5 | `freeBusy.query` used to read provider busy blocks | ⬜ |
-| 2.6 | Available slots generated from calendar + availability rules + service duration | ⬜ |
-| 2.7 | Returns top 3 valid slots with `slot_start` / `slot_end` | ⬜ |
-| 2.8 | Spoken labels generated for English, Hindi, and Mandarin | ⬜ |
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 2.4 | Google Calendar OAuth credentials created and connected | 🔄 | Client ID + Secret added to `.env`; refresh token pending |
+| 2.5 | `freeBusy.query` used to read provider busy blocks | ⬜ | |
+| 2.6 | Available slots generated from calendar + availability rules + service duration | ⬜ | |
+| 2.7 | Returns top 3 valid slots with `slot_start` / `slot_end` | ⬜ | |
+| 2.8 | Spoken labels generated for English, Hindi, and Mandarin | ⬜ | |
 
 ### n8n Workflows (Week 2)
-| # | Feature | Status |
-|---|---------|--------|
-| 2.9 | n8n workflow: quote engine (takes structured JSON, returns quote) | ⬜ |
-| 2.10 | n8n workflow: availability engine (takes duration + date window, returns 3 slots) | ⬜ |
-| 2.11 | Test results stored in PostgreSQL for traceability | ⬜ |
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 2.9 | n8n workflow: quote engine (takes structured JSON, returns quote) | ✅ | Live at `n8n-uz06.onrender.com/webhook/quote-engine` |
+| 2.10 | n8n workflow: availability engine (takes duration + date window, returns 3 slots) | ⬜ | |
+| 2.11 | Test results stored in PostgreSQL for traceability | ⬜ | |
 
 ### Local AI Service (Ollama)
 | # | Feature | Status |
@@ -251,27 +252,32 @@ Legend: ✅ Implemented · ⬜ Not started
 
 ## Summary
 
-| Phase | Total | Done | Remaining |
-|-------|-------|------|-----------|
-| Week 1 — Foundation & Schema | 25 | 22 | 3 |
-| Backend Express Server | 5 | 5 | 0 |
-| Week 2 — Quote & Availability | 13 | 0 | 13 |
-| Week 3 — IVR, Booking & Cancellation | 27 | 13 | 14 |
-| Week 4 — Reminders, Dashboard & Handover | 31 | 0 | 31 |
-| **Total** | **101** | **40** | **61** |
+| Phase | Total | Done | In Progress | Remaining |
+|-------|-------|------|-------------|-----------|
+| Week 1 — Foundation & Schema | 25 | 24 | 0 | 1 |
+| Backend Express Server | 6 | 6 | 0 | 0 |
+| Week 2 — Quote & Availability | 13 | 4 | 1 | 8 |
+| Week 3 — IVR, Booking & Cancellation | 27 | 13 | 0 | 14 |
+| Week 4 — Reminders, Dashboard & Handover | 31 | 0 | 0 | 31 |
+| **Total** | **102** | **47** | **1** | **54** |
+
+> 🔄 = in progress (partially done)
 
 ### What is done
-- Complete PostgreSQL schema (all 9 tables) with indexes and seed data, applied to live Render DB
-- Backend and dashboard `.env` templates (simplified to `DATABASE_URL`)
-- Architecture note with stack overview, design principles, webhook URL strategy, state machine diagram
-- Express backend server: `/health`, `/webhook/twilio`, Twilio signature validation, PostgreSQL pool
-- IVR states: `LANGUAGE_MENU`, `MAIN_MENU_EN`, `MAIN_MENU_HI`, `MAIN_MENU_ZH` — all tested
-- Stateful call tracking: `calls` table updated on every transition
-- DTMF + speech input parsing, key-9 repeat on all current menus
+- Complete PostgreSQL schema (all 9 tables), indexes, seed data — live on Render PostgreSQL
+- Backend and dashboard `.env` templates
+- Architecture note (`docs/architecture.md`) — stack, design principles, webhook URL strategy, state machine
+- Express backend: `/health`, `/webhook/twilio`, Twilio signature validation, PostgreSQL pool, Google OAuth route
+- n8n deployed on Render (`n8n-uz06.onrender.com`), hello-world webhook verified
+- IVR states: `LANGUAGE_MENU`, `MAIN_MENU_EN`, `MAIN_MENU_HI`, `MAIN_MENU_ZH` — tested and working
+- Stateful call tracking, DTMF + speech parsing, key-9 repeat
+- **Quote engine** (n8n): car detailing + cleaning rules, tested for both business types
+- Google Cloud project created, Calendar API enabled, OAuth credentials configured
 
 ### What is next (in order)
-1. **Finish Week 1:** Expose server via ngrok, point Twilio console webhook at it, verify on a real phone (1.23, 1.24)
-2. **Week 2:** Quote engine, Google Calendar OAuth + availability engine, n8n setup
-3. **Week 3 (cont.):** `SERVICE_MENU_NEW`, `COLLECT_REQUIRED_FIELDS`, booking/cancellation states, sub-workflow integration
-4. **Week 4:** Reminders, provider summary, Next.js dashboard
-5. **Post-MVP:** Reschedule flow, customer web pages, AI fallback layer
+1. **Complete 2.4:** Run backend → visit `http://localhost:3001/auth/google` → get refresh token → add to `.env`
+2. **Week 2 (cont.):** Build availability engine n8n workflow (freeBusy + slot generation)
+3. **Week 1 finish:** Expose backend via ngrok, point Twilio webhook, verify on real phone (1.23, 1.24)
+4. **Week 3 (cont.):** `SERVICE_MENU_NEW`, `COLLECT_REQUIRED_FIELDS`, booking/cancellation states
+5. **Week 4:** Reminders, provider summary, Next.js dashboard
+6. **Post-MVP:** Reschedule flow, customer web pages, AI fallback layer

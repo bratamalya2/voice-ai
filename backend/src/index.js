@@ -3,6 +3,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const express = require('express');
 const pool    = require('./db');
 const twilioRouter = require('./routes/twilio');
+const authRouter   = require('./routes/auth');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +28,9 @@ app.get('/health', async (req, res) => {
 
 // Twilio webhook
 app.use('/webhook/twilio', twilioRouter);
+
+// Google OAuth (one-time use to get refresh token)
+app.use('/auth', authRouter);
 
 // ─── Start ───────────────────────────────────────────────────────────────────
 
