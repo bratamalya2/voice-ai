@@ -1,0 +1,124 @@
+{
+  "name": "quote-and-availability",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "quote-and-availability",
+        "responseMode": "responseNode",
+        "authentication": "none",
+        "options": {}
+      },
+      "id": "f1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-uz06.onrender.com/webhook/quote-engine",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyContentType": "application/json",
+        "body": "={\n  \"serviceType\": \"{{ $json.serviceType }}\",\n  \"vehicleType\": \"{{ $json.vehicleType }}\",\n  \"condition\": \"{{ $json.condition }}\",\n  \"addon\": \"{{ $json.addon }}\",\n  \"suburb\": \"{{ $json.suburb }}\",\n  \"propertyType\": \"{{ $json.propertyType }}\",\n  \"bedrooms\": {{ $json.bedrooms || 0 }},\n  \"bathrooms\": {{ $json.bathrooms || 0 }},\n  \"frequency\": \"{{ $json.frequency }}\"\n}",
+        "options": {}
+      },
+      "id": "a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
+      "name": "Get Quote",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://5d07-49-37-44-193.ngrok-free.app/api/availability",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyContentType": "application/json",
+        "body": "={\n  \"startDate\": \"{{ $('Webhook').first().json.startDate }}\",\n  \"endDate\": \"{{ $('Webhook').first().json.endDate }}\",\n  \"serviceDuration\": {{ $('Webhook').first().json.serviceDuration }}\n}",
+        "options": {}
+      },
+      "id": "b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
+      "name": "Get Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Combine quote result with availability slots into one response\nconst quote = $('Get Quote').first().json;\nconst slots = $input.all().map(item => ({\n  slot_number: item.json.slot_number,\n  slot_start: item.json.slot_start,\n  slot_end: item.json.slot_end,\n  duration_minutes: item.json.duration_minutes,\n  spoken_labels: item.json.spoken_labels\n}));\n\nreturn [{\n  json: {\n    quote_min: quote.quote_min,\n    quote_max: quote.quote_max,\n    manual_review: quote.manual_review || false,\n    slots: slots\n  }\n}];"
+      },
+      "id": "c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d5e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Quote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Quote": {
+      "main": [
+        [
+          {
+            "node": "Get Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Availability": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Results": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": null
+}

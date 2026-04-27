@@ -1,0 +1,97 @@
+{
+  "name": "availability-engine",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "availability-engine",
+        "authentication": "none",
+        "options": {}
+      },
+      "id": "d3e8f9a1-2b3c-4d5e-6f7a-8b9c0d1e2f3a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.BACKEND_API_URL }}/api/availability",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyContentType": "application/json",
+        "body": "{\n  \"startDate\": \"{{ $json.startDate }}\",\n  \"endDate\": \"{{ $json.endDate }}\",\n  \"serviceDuration\": {{ $json.serviceDuration }}\n}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "name": "Call Backend API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "connections": {
+        "Webhook": [
+          [
+            {
+              "node": "Call Backend API",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "responseCode": 200,
+        "responseBody": "{{ $json }}",
+        "options": {}
+      },
+      "id": "f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "connections": {
+        "Call Backend API": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call Backend API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Backend API": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "errorHandler": "STOP_ON_FIRST_ERROR"
+  },
+  "staticData": null,
+  "pinData": null
+}
