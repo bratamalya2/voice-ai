@@ -1,0 +1,142 @@
+{
+  "name": "customer-reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "e0a1b2c3-d4e5-4f6a-b7c8-d9e0f1a2b3c4",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT b.booking_id, c.phone, b.scheduled_start, s.name_en AS service_name, biz.business_name \nFROM bookings b \nJOIN customers c ON b.customer_id = c.customer_id \nJOIN services s ON b.service_id = s.service_id \nJOIN businesses biz ON b.business_id = biz.business_id \nWHERE b.status = 'confirmed' \n  AND b.scheduled_start >= NOW() + interval '24 hours' \n  AND b.scheduled_start < NOW() + interval '25 hours'"
+      },
+      "id": "f1a2b3c4-d5e6-4f7a-b8c9-d0e1f2a3b4c5",
+      "name": "Get Upcoming Bookings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "your-postgres-credential-id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "from": "={{ $node[\"Get Upcoming Bookings\"].json[\"business_name\"] }}",
+        "to": "={{ $node[\"Get Upcoming Bookings\"].json[\"phone\"] }}",
+        "message": "=Reminder: Your {{ $node[\"Get Upcoming Bookings\"].json[\"service_name\"] }} with {{ $node[\"Get Upcoming Bookings\"].json[\"business_name\"] }} is scheduled for tomorrow at {{ new Date($node[\"Get Upcoming Bookings\"].json[\"scheduled_start\"]).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' }) }}. See you then!"
+      },
+      "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
+      "name": "Send SMS Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "your-twilio-credential-id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": {
+          "__fixedValue": "notification_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $node[\"Get Upcoming Bookings\"].json[\"booking_id\"] }}",
+            "recipient_type": "customer",
+            "channel": "sms",
+            "body": "=Reminder: Your {{ $node[\"Get Upcoming Bookings\"].json[\"service_name\"] }} with {{ $node[\"Get Upcoming Bookings\"].json[\"business_name\"] }} is scheduled for tomorrow at {{ new Date($node[\"Get Upcoming Bookings\"].json[\"scheduled_start\"]).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' }) }}. See you then!",
+            "status": "sent",
+            "sent_at": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [],
+          "schema": {
+            "__fixedValue": "public"
+          }
+        },
+        "options": {}
+      },
+      "id": "b2c3d4e5-f6a7-4890-bcde-f01234567890",
+      "name": "Log Notification",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "your-postgres-credential-id"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Upcoming Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Upcoming Bookings": {
+      "main": [
+        [
+          {
+            "node": "Send SMS Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Reminder": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": null
+}

@@ -113,6 +113,20 @@ app.post("/api/availability", async (req, res) => {
   }
 });
 
+// ─── Services API ────────────────────────────────────────────────────────────
+
+app.get("/api/services/:businessId", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT service_id, service_code, name_en, duration_minutes, base_price_min, base_price_max FROM services WHERE business_id = $1 AND active = TRUE ORDER BY keypad_option",
+      [req.params.businessId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ─── Booking APIs ────────────────────────────────────────────────────────────
 
 /**

@@ -1,0 +1,150 @@
+{
+  "name": "provider-summary-1630",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 16 * * *"
+            }
+          ]
+        }
+      },
+      "id": "e0a1b2c3-d4e5-4f6a-b7c8-d9e0f1a2b3c4",
+      "name": "Daily Trigger (16:30)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT biz.business_id, biz.business_name, biz.provider_email \nFROM businesses biz \nWHERE biz.active = TRUE"
+      },
+      "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
+      "name": "Get Active Businesses",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "your-postgres-credential-id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT b.scheduled_start, s.name_en AS service_name, c.full_name AS customer_name, b.quote_min, b.quote_max \nFROM bookings b \nJOIN customers c ON b.customer_id = c.customer_id \nJOIN services s ON b.service_id = s.service_id \nWHERE b.business_id = '{{ $json[\"business_id\"] }}' \n  AND b.status = 'confirmed' \n  AND b.scheduled_start >= (CURRENT_DATE + 1) \n  AND b.scheduled_start < (CURRENT_DATE + 2)\nORDER BY b.scheduled_start ASC"
+      },
+      "id": "f1a2b3c4-d5e6-4f7a-b8c9-d0e1f2a3b4c5",
+      "name": "Get Tomorrow's Bookings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "your-postgres-credential-id"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nif (items.length === 0) return [];\n\nconst business = $node[\"Get Active Businesses\"].json;\nlet totalMin = 0, totalMax = 0;\nlet listHtml = '<ul>';\n\nitems.forEach(item => {\n  const b = item.json;\n  totalMin += parseFloat(b.quote_min || 0);\n  totalMax += parseFloat(b.quote_max || 0);\n  const time = new Date(b.scheduled_start).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });\n  listHtml += `<li><strong>${time}</strong>: ${b.service_name} (${b.customer_name || 'No Name'}) — Est. $${b.quote_min}-$${b.quote_max}</li>`;\n});\n\nlistHtml += '</ul>';\n\nreturn [{\n  json: {\n    business_name: business.business_name,\n    provider_email: business.provider_email,\n    total_count: items.length,\n    total_min: totalMin,\n    total_max: totalMax,\n    list_html: listHtml\n  }\n}];"
+      },
+      "id": "b2c3d4e5-f6a7-4890-bcde-f01234567890",
+      "name": "Format Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@voiceagent.com",
+        "toEmail": "={{ $json[\"provider_email\"] }}",
+        "subject": "=Tomorrow's Booking Summary - {{ $json[\"business_name\"] }}",
+        "html": "=<h2>Daily Summary for Tomorrow</h2>\n<p>Hello! You have <strong>{{ $json[\"total_count\"] }}</strong> bookings scheduled for tomorrow.</p>\n<p><strong>Estimated Revenue:</strong> ${{ $json[\"total_min\"] }} - ${{ $json[\"total_max\"] }}</p>\n<h3>Schedule:</h3>\n{{ $json[\"list_html\"] }}\n<p>Log in to your dashboard for more details.</p>"
+      },
+      "id": "c3d4e5f6-a7b8-49c0-9d0e-1f2a3b4c5d6e",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "your-smtp-credential-id"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Trigger (16:30)": {
+      "main": [
+        [
+          {
+            "node": "Get Active Businesses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Businesses": {
+      "main": [
+        [
+          {
+            "node": "Get Tomorrow's Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Tomorrow's Bookings": {
+      "main": [
+        [
+          {
+            "node": "Format Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": null
+}

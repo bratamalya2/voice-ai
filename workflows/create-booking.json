@@ -5,8 +5,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "create-booking",
-        "responseMode": "responseNode",
-        "authentication": "none",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b",
@@ -18,11 +17,11 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://5d07-49-37-44-193.ngrok-free.app/api/bookings",
-        "authentication": "none",
+        "url": "https://5f00-49-37-46-115.ngrok-free.app/api/bookings",
         "sendBody": true,
-        "bodyContentType": "application/json",
-        "body": "={\n  \"businessId\": \"{{ $json.businessId }}\",\n  \"serviceId\": \"{{ $json.serviceId }}\",\n  \"callerPhone\": \"{{ $json.callerPhone }}\",\n  \"customerName\": \"{{ $json.customerName }}\",\n  \"customerEmail\": \"{{ $json.customerEmail }}\",\n  \"slotStart\": \"{{ $json.slotStart }}\",\n  \"slotEnd\": \"{{ $json.slotEnd }}\",\n  \"quoteMin\": {{ $json.quoteMin }},\n  \"quoteMax\": {{ $json.quoteMax }},\n  \"suburb\": \"{{ $json.suburb }}\",\n  \"notes\": \"{{ $json.notes }}\"\n}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ (d => ({ businessId: d.businessId, serviceId: d.serviceId, callerPhone: d.callerPhone, customerName: d.customerName, customerEmail: d.customerEmail, slotStart: d.slotStart, slotEnd: d.slotEnd, quoteMin: d.quoteMin || 0, quoteMax: d.quoteMax || 0, suburb: d.suburb, notes: d.notes }))($json.body || $json) }}",
         "options": {}
       },
       "id": "f7a8b9c0-d1e2-4f3a-4b5c-6d7e8f9a0b1c",
@@ -30,40 +29,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [460, 300]
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "id": "a8b9c0d1-e2f3-4a4b-5c6d-7e8f9a0b1c2d",
-      "name": "Respond to Webhook",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [680, 300]
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Create Booking",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create Booking": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Create Booking", "type": "main", "index": 0 }]]
     }
   },
   "active": false,
