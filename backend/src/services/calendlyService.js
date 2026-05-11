@@ -1,6 +1,29 @@
 const axios = require("axios");
 
 const CALENDLY_API_BASE = "https://api.calendly.com";
+const TZ = process.env.TIMEZONE || "Australia/Melbourne";
+
+// Extract date parts (year, month 1-12, day, hour, minute, dayOfWeek 0-6) in TZ
+function tzParts(date) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ, year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", weekday: "short", hour12: false,
+  });
+  const p = Object.fromEntries(fmt.formatToParts(date).map(({ type, value }) => [type, value]));
+  const dow = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return {
+    year: parseInt(p.year), month: parseInt(p.month), day: parseInt(p.day),
+    hour: parseInt(p.hour), minute: parseInt(p.minute), dayOfWeek: dow[p.weekday] ?? 0,
+  };
+}
+
+// Convert a local business-timezone hour on a given date to a UTC Date
+function localHourToUTC(year, month1, day, hour) {
+  const utcMidnight = new Date(Date.UTC(year, month1 - 1, day));
+  const { hour: tzHour, minute: tzMin } = tzParts(utcMidnight);
+  const offsetMs = (tzHour * 60 + tzMin) * 60000;
+  return new Date(utcMidnight.getTime() - offsetMs + hour * 3600000);
+}
 
 /**
  * Get authorization headers for Calendly API
@@ -45,46 +68,43 @@ async function getUserUri() {
  * @returns {Array} List of available slots
  */
 async function getAvailableSlots(startTime, endTime) {
+  let busyIntervals = [];
   try {
     const userUri = await getUserUri();
-
-    // Get scheduled events (busy blocks)
-    const eventsResponse = await axios.get(`${CALENDLY_API_BASE}/scheduled_events`, {
+    const resp = await axios.get(`${CALENDLY_API_BASE}/scheduled_events`, {
       headers: getHeaders(),
-      params: {
-        user: userUri,
-        min_start_time: startTime,
-        max_start_time: endTime,
-      },
+      params: { user: userUri, min_start_time: startTime, max_start_time: endTime },
     });
+    busyIntervals = (resp.data.collection || []).map(e => ({
+      start: new Date(e.start_time),
+      end:   new Date(e.end_time),
+    }));
+  } catch {
+    // Calendly unavailable — generate slots without busy-time filtering
+  }
 
-    const scheduledEvents = eventsResponse.data.collection || [];
+  const slots = [];
+  const end = new Date(endTime);
 
-    // For now, return mock available slots
-    // In a real implementation, you would:
-    // 1. Parse scheduledEvents to find busy times
-    // 2. Generate free slots by filling gaps
-    // 3. Filter based on business hours from event_types
+  // Iterate UTC days; check day-of-week in Melbourne timezone
+  for (let cur = new Date(startTime); cur <= end && slots.length < 3; cur.setUTCDate(cur.getUTCDate() + 1)) {
+    const { dayOfWeek, year, month, day } = tzParts(cur);
+    if (dayOfWeek === 0) continue; // skip Sunday
 
-    // Mock data: Generate 3 slots at 10am, 2pm, 9am next days
-    const slots = [];
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    // Business hours in Melbourne: Mon–Fri 8am–5pm, Sat 9am–3pm
+    const openHour  = dayOfWeek === 6 ? 9  : 8;
+    const closeHour = dayOfWeek === 6 ? 15 : 17;
 
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      if (slots.length < 3) {
-        slots.push({
-          start_time: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10, 0, 0).toISOString(),
-          end_time: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 11, 0, 0).toISOString(),
-        });
+    for (let h = openHour; h < closeHour && slots.length < 3; h++) {
+      const slotStart = localHourToUTC(year, month, day, h);
+      const slotEnd   = new Date(slotStart.getTime() + 3600000);
+      if (!busyIntervals.some(b => slotStart < b.end && slotEnd > b.start)) {
+        slots.push({ start_time: slotStart.toISOString(), end_time: slotEnd.toISOString() });
       }
     }
-
-    return slots;
-  } catch (error) {
-    console.error('Calendly API error (getAvailableSlots):', error.response?.data || error.message);
-    throw new Error(`Failed to fetch available slots: ${error.message}`);
   }
+
+  return slots;
 }
 
 /**

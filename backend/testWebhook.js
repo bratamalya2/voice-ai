@@ -25,7 +25,7 @@ async function sendWebhook(params) {
 
 async function runTest() {
   const callSid = 'TEST_' + Date.now();
-  const toPhone = '+61400000001'; // Shine Mobile Detailing
+  const toPhone = '+61347084980'; // Shine Mobile Detailing
   
   // 1. Start Call -> Expect LANGUAGE_MENU
   await sendWebhook({

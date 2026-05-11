@@ -8,6 +8,25 @@
  *   "星期一，四月21日上午10:00"
  */
 
+const TZ = process.env.TIMEZONE || "Australia/Melbourne";
+
+// Extract date/time parts from a UTC Date in the business timezone
+function tzParts(date) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ, year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", weekday: "short", hour12: false,
+  });
+  const p = Object.fromEntries(fmt.formatToParts(date).map(({ type, value }) => [type, value]));
+  const dow = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return {
+    dayOfWeek: dow[p.weekday] ?? 0,
+    day:       parseInt(p.day),
+    month:     parseInt(p.month) - 1, // 0-indexed for monthNames arrays
+    hour:      parseInt(p.hour),
+    minute:    parseInt(p.minute),
+  };
+}
+
 const dayNames = {
   en: [
     "Sunday",
@@ -112,36 +131,25 @@ function formatTime24Hour(hour, minute) {
 }
 
 /**
- * Generate spoken label for a slot in English
- * @param {Date} date - Slot start date
+ * Generate spoken label for a slot in the given language.
+ * Times are always shown in the business timezone (TIMEZONE env var).
+ * @param {Date} date - Slot start as a UTC Date
  * @param {string} lang - Language code ('en', 'hi', 'zh')
  * @returns {string} Human-readable label
  */
 function generateSlotLabel(date, lang = "en") {
-  const dayName = dayNames[lang][date.getDay()];
-  const dayNum = date.getDate();
-  const monthName = monthNames[lang][date.getMonth()];
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-
-  let timeStr;
-  let timeLabel;
+  const { dayOfWeek, day, month, hour, minute } = tzParts(date);
+  const dayName   = dayNames[lang][dayOfWeek];
+  const monthName = monthNames[lang][month];
 
   if (lang === "en") {
-    const ordinal = getOrdinalSuffix(dayNum);
-    timeStr = formatTime12Hour(hour, minute);
-    timeLabel = `${dayName}, ${monthName} ${dayNum}${ordinal} at ${timeStr}`;
+    const ordinal = getOrdinalSuffix(day);
+    return `${dayName}, ${monthName} ${day}${ordinal} at ${formatTime12Hour(hour, minute)}`;
   } else if (lang === "hi") {
-    timeStr = formatTime24Hour(hour, minute);
-    // Hindi: Day, Date Month को time बजे
-    timeLabel = `${dayName}, ${dayNum} ${monthName} को ${timeStr} बजे`;
-  } else if (lang === "zh") {
-    timeStr = formatTime24Hour(hour, minute);
-    // Chinese: Day, Month Date at time
-    timeLabel = `${dayName}，${monthName}${dayNum}日${timeStr}`;
+    return `${dayName}, ${day} ${monthName} को ${formatTime24Hour(hour, minute)} बजे`;
+  } else {
+    return `${dayName}，${monthName}${day}日${formatTime24Hour(hour, minute)}`;
   }
-
-  return timeLabel;
 }
 
 /**

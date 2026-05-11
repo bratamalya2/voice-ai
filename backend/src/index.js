@@ -31,7 +31,7 @@ app.get("/health", async (req, res) => {
 });
 
 // Twilio webhook
-app.use("/webhook/twilio", twilioRouter);
+app.use("/webhook/twilio", twilioRouter); 
 
 // ─── n8n Integration APIs ───────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ app.post("/api/availability", async (req, res) => {
     // Filter to top 3 matching service duration
     const topSlots = calendlyService.filterSlotsByDuration(
       slots,
-      serviceDuration,
+      serviceDuration, 
       3
     );
 
@@ -135,6 +135,8 @@ app.get("/api/services/:businessId", async (req, res) => {
  *        slotStart, slotEnd, quoteMin, quoteMax, suburb (opt), notes (opt)
  * Output: { bookingId, customerId, calendarEventId }
  */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 app.post("/api/bookings", async (req, res) => {
   const {
     businessId, serviceId, callerPhone, customerName, customerEmail,
@@ -147,7 +149,25 @@ app.post("/api/bookings", async (req, res) => {
     });
   }
 
+  if (!UUID_RE.test(String(businessId))) {
+    return res.status(400).json({ error: `businessId must be a valid UUID, got: ${businessId}` });
+  }
+  if (!UUID_RE.test(String(serviceId))) {
+    return res.status(400).json({ error: `serviceId must be a valid UUID, got: ${serviceId}` });
+  }
+
   try {
+    // Recheck slot availability — reject if another confirmed booking overlaps (3.30)
+    const conflict = await pool.query(
+      `SELECT booking_id FROM bookings
+       WHERE business_id = $1 AND status = 'confirmed'
+         AND scheduled_start < $3 AND scheduled_end > $2`,
+      [businessId, slotStart, slotEnd]
+    );
+    if (conflict.rows.length > 0) {
+      return res.status(409).json({ error: "The selected time slot is no longer available. Please choose another time." });
+    }
+
     // Upsert customer by phone
     const customerResult = await pool.query(
       `INSERT INTO customers (phone, full_name, email)
@@ -172,28 +192,6 @@ app.post("/api/bookings", async (req, res) => {
     );
     const bookingId = bookingResult.rows[0].booking_id;
 
-    // Try to create Calendly event (best-effort — don't fail booking if it errors)
-    let calendarEventId = null;
-    if (customerEmail) {
-      try {
-        const event = await calendlyService.createEvent({
-          title: `Booking #${bookingId}`,
-          description: notes || "",
-          startTime: slotStart,
-          endTime: slotEnd,
-          inviteeEmail: customerEmail,
-          inviteeName: customerName || "Customer",
-        });
-        calendarEventId = event.calendar_event_id;
-        await pool.query(
-          "UPDATE bookings SET calendar_event_id = $1 WHERE booking_id = $2",
-          [calendarEventId, bookingId]
-        );
-      } catch (calErr) {
-        console.error("Calendly event creation failed (non-fatal):", calErr.message);
-      }
-    }
-
     // Log booking event
     await pool.query(
       `INSERT INTO booking_events (booking_id, event_type, event_payload)
@@ -201,7 +199,7 @@ app.post("/api/bookings", async (req, res) => {
       [bookingId, JSON.stringify({ quoteMin, quoteMax, slotStart, slotEnd, suburb })]
     );
 
-    res.json({ bookingId, customerId, calendarEventId });
+    res.json({ bookingId, customerId, calendarEventId: null });
   } catch (error) {
     console.error("Create booking error:", error.message);
     res.status(500).json({ error: error.message });
@@ -219,7 +217,8 @@ app.get("/api/bookings/phone/:phone", async (req, res) => {
     const result = await pool.query(
       `SELECT b.booking_id, b.status, b.scheduled_start, b.scheduled_end,
               b.quote_min, b.quote_max, b.suburb, b.calendar_event_id,
-              s.name_en AS service_name, s.name_hi, s.name_zh
+              s.name_en AS service_name, s.name_hi, s.name_zh,
+              s.service_code, s.duration_minutes
        FROM bookings b
        JOIN customers  c ON b.customer_id = c.customer_id
        JOIN services   s ON b.service_id  = s.service_id
@@ -285,6 +284,58 @@ app.post("/api/bookings/:id/cancel", async (req, res) => {
     res.json({ success: true, bookingId: id });
   } catch (error) {
     console.error("Cancel booking error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/bookings/:id/reschedule — Move a booking to a new slot
+ * Input: slotStart, slotEnd (ISO strings)
+ * Output: { success, bookingId }
+ */
+app.put("/api/bookings/:id/reschedule", async (req, res) => {
+  const { id } = req.params;
+  const { slotStart, slotEnd } = req.body;
+
+  if (!slotStart || !slotEnd) {
+    return res.status(400).json({ error: "Missing required fields: slotStart, slotEnd" });
+  }
+
+  try {
+    const booking = await pool.query("SELECT * FROM bookings WHERE booking_id = $1", [id]);
+
+    if (!booking.rows.length) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+    if (booking.rows[0].status === "cancelled") {
+      return res.status(400).json({ error: "Cannot reschedule a cancelled booking" });
+    }
+
+    // Check for conflicts with other confirmed bookings at the new time
+    const conflict = await pool.query(
+      `SELECT booking_id FROM bookings
+       WHERE business_id = $1 AND status = 'confirmed' AND booking_id != $2
+         AND scheduled_start < $4 AND scheduled_end > $3`,
+      [booking.rows[0].business_id, id, slotStart, slotEnd]
+    );
+    if (conflict.rows.length > 0) {
+      return res.status(409).json({ error: "The selected time slot is no longer available." });
+    }
+
+    await pool.query(
+      "UPDATE bookings SET scheduled_start = $1, scheduled_end = $2, updated_at = NOW() WHERE booking_id = $3",
+      [slotStart, slotEnd, id]
+    );
+
+    await pool.query(
+      `INSERT INTO booking_events (booking_id, event_type, event_payload)
+       VALUES ($1, 'booking_rescheduled', $2)`,
+      [id, JSON.stringify({ newStart: slotStart, newEnd: slotEnd, rescheduled_at: new Date().toISOString() })]
+    );
+
+    res.json({ success: true, bookingId: id });
+  } catch (error) {
+    console.error("Reschedule booking error:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
