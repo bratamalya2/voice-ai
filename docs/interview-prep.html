@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Voice Booking System — Interview Preparation Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1a1a2e; line-height: 1.7; background: #fff; }
+
+  /* ── Cover Page ── */
+  .cover {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 60%, #0f3460 100%);
+    color: #fff; padding: 60px 40px; page-break-after: always;
+  }
+  .cover h1 { font-size: 2.4em; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .cover .subtitle { font-size: 1.1em; color: #a8d8ea; margin-bottom: 40px; }
+  .cover .badge-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+  .badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+           color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+  .cover .meta { color: #a8d8ea; font-size: 0.9em; }
+
+  /* ── Layout ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 48px; }
+  @media print { .container { padding: 20px 32px; } }
+
+  /* ── Section headers ── */
+  .section { margin-bottom: 52px; page-break-inside: avoid; }
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(90deg, #0f3460, #16213e);
+    color: #fff; padding: 14px 20px; border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  .section-num {
+    background: rgba(255,255,255,0.2); border-radius: 50%;
+    width: 32px; height: 32px; display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 0.95em; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.2em; font-weight: 700; }
+
+  h3 { font-size: 1.05em; font-weight: 700; color: #0f3460; margin: 20px 0 8px; }
+  h4 { font-size: 0.95em; font-weight: 700; color: #333; margin: 14px 0 6px; }
+  p  { margin-bottom: 10px; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 0.88em; }
+  th { background: #0f3460; color: #fff; padding: 9px 12px; text-align: left; }
+  td { padding: 8px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f8fc; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #1a1a2e; color: #e2e8f0; padding: 16px 18px;
+    border-radius: 8px; overflow-x: auto; font-size: 0.82em;
+    font-family: 'Consolas', 'Courier New', monospace; margin: 12px 0 18px;
+    line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+  }
+  code { background: #eef0f7; color: #c0392b; padding: 2px 6px; border-radius: 4px; font-size: 0.88em; font-family: 'Consolas', monospace; }
+
+  /* ── Callout boxes ── */
+  .box { border-radius: 8px; padding: 14px 18px; margin: 14px 0; }
+  .box-info    { background: #e8f4fd; border-left: 4px solid #2980b9; }
+  .box-warn    { background: #fef9e7; border-left: 4px solid #f39c12; }
+  .box-success { background: #eafaf1; border-left: 4px solid #27ae60; }
+  .box-danger  { background: #fdf2f2; border-left: 4px solid #e74c3c; }
+  .box strong  { display: block; margin-bottom: 4px; }
+
+  /* ── Q&A blocks ── */
+  .qa { margin: 14px 0; }
+  .question {
+    background: #0f3460; color: #fff; padding: 10px 16px;
+    border-radius: 6px 6px 0 0; font-weight: 700; font-size: 0.92em;
+  }
+  .answer {
+    background: #f7f8fc; border: 1px solid #dde; border-top: none;
+    padding: 12px 16px; border-radius: 0 0 6px 6px; font-size: 0.9em;
+  }
+
+  /* ── Flow diagrams ── */
+  .flow {
+    background: #f7f8fc; border: 1px solid #dde; border-radius: 8px;
+    padding: 18px 20px; font-family: 'Consolas', monospace;
+    font-size: 0.82em; line-height: 1.8; margin: 14px 0;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ── Tag pills ── */
+  .tag { display: inline-block; background: #eef0f7; color: #0f3460;
+         border: 1px solid #c5cae9; padding: 2px 10px; border-radius: 12px;
+         font-size: 0.8em; font-weight: 600; margin: 2px 3px; }
+
+  /* ── Resume box ── */
+  .resume-box {
+    background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px;
+    padding: 16px 20px; margin: 14px 0; font-style: italic; color: #444;
+  }
+
+  /* ── Mistake list ── */
+  .mistake { display: flex; gap: 12px; align-items: flex-start; margin: 10px 0; }
+  .mistake .icon { font-size: 1.1em; flex-shrink: 0; margin-top: 2px; }
+
+  ul, ol { padding-left: 22px; margin: 8px 0 12px; }
+  li { margin-bottom: 5px; }
+
+  /* ── Resume bullet list ── */
+  .resume-bullets { list-style: none; padding: 0; }
+  .resume-bullets li + li { margin-top: 8px; }
+
+  /* ── Golden rule box ── */
+  .box-golden { margin-top: 24px; }
+
+  /* ── Page break hints ── */
+  .page-break { page-break-before: always; }
+
+  /* ── TOC ── */
+  .toc { background: #f7f8fc; border: 1px solid #dde; border-radius: 8px; padding: 20px 28px; margin-bottom: 40px; }
+  .toc h2 { color: #0f3460; font-size: 1.1em; margin-bottom: 12px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <h1>Automated Voice Booking System</h1>
+  <div class="subtitle">Complete Interview Preparation Guide — From Fresher to Confident</div>
+  <div class="badge-row">
+    <span class="badge">Node.js</span>
+    <span class="badge">Twilio</span>
+    <span class="badge">n8n</span>
+    <span class="badge">PostgreSQL</span>
+    <span class="badge">Next.js</span>
+    <span class="badge">Calendly API</span>
+    <span class="badge">IVR / TwiML</span>
+    <span class="badge">REST APIs</span>
+  </div>
+  <div class="meta">
+    Prepared for Interview Readiness &nbsp;·&nbsp; Senior Backend Engineer Perspective<br/>
+    Based on production codebase — Shine Mobile Detailing demo
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ MAIN -->
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li>High-Level Architecture</li>
+    <li>Detailed Component Breakdown</li>
+    <li>Call Flow Explanation</li>
+    <li>System Design Concepts</li>
+    <li>Backend Design</li>
+    <li>AI Integration (Ollama — planned layer)</li>
+    <li>n8n Workflows</li>
+    <li>Common Interview Questions &amp; Strong Answers</li>
+    <li>Resume Explanation</li>
+    <li>Advanced Improvements</li>
+    <li>Common Fresher Mistakes</li>
+  </ol>
+</div>
+
+
+<!-- ══════════════════════════════════ 1. HIGH-LEVEL ARCHITECTURE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>High-Level Architecture</h2>
+  </div>
+
+  <h3>What is this system?</h3>
+  <p>
+    An automated phone-based booking system for small service businesses (e.g. car detailing, cleaning).
+    Customers call a number, navigate an IVR menu using keypad or voice, and can book, reschedule,
+    cancel, or get quotes — all without a human operator.
+  </p>
+
+  <h3>Complete System Flow</h3>
+  <div class="flow">📞 Customer dials Twilio number (+61 3 4708 4980)
+        │
+        ▼
+┌─────────────────────────────────────────┐
+│          TWILIO (Cloud Telephony)        │
+│  Converts voice call to HTTPS webhook   │
+│  Sends DTMF digits + SpeechResult       │
+└──────────────┬──────────────────────────┘
+               │  POST /webhook/twilio
+               ▼
+┌─────────────────────────────────────────┐
+│         EXPRESS BACKEND (Node.js)        │
+│  • Validates Twilio signature (HMAC)    │
+│  • Reads call state from PostgreSQL     │
+│  • Routes to correct IVR state handler  │
+│  • Returns TwiML XML response           │
+└──────┬──────────────┬────────────────────┘
+       │              │
+       ▼              ▼
+┌────────────┐  ┌──────────────────────────┐
+│ PostgreSQL │  │       n8n Workflows       │
+│  Database  │  │  • Quote engine           │
+│  (Render)  │  │  • Availability engine    │
+│            │  │  • Reminder scheduler     │
+└────────────┘  │  • Provider email summary │
+                └──────────────┬────────────┘
+                               │
+                               ▼
+                   ┌──────────────────────┐
+                   │   Calendly API        │
+                   │  (availability slots) │
+                   └──────────────────────┘
+
+┌─────────────────────────────────────────┐
+│         Next.js DASHBOARD               │
+│  Provider admin: bookings, calls, stats │
+│  Connects directly to PostgreSQL        │
+└─────────────────────────────────────────┘</div>
+
+  <h3>Design Principle: Deterministic Core, AI at the Edges</h3>
+  <div class="box box-info">
+    <strong>Key Architectural Decision</strong>
+    All business-critical logic (quote calculation, booking creation, cancellation) uses deterministic code — no AI.
+    AI (Ollama) is only used at the edges for speech normalisation and off-script fallback.
+    This ensures the system is auditable, predictable, and debuggable.
+  </div>
+
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Role</th></tr>
+    <tr><td>Telephony</td><td>Twilio Voice + TwiML</td><td>Inbound call handling, DTMF, speech-to-text</td></tr>
+    <tr><td>Backend API</td><td>Node.js + Express</td><td>IVR state machine, webhook handler, REST APIs</td></tr>
+    <tr><td>Workflow Engine</td><td>n8n</td><td>Quote logic, reminders, email summaries</td></tr>
+    <tr><td>Database</td><td>PostgreSQL</td><td>Bookings, customers, calls, services</td></tr>
+    <tr><td>Calendar</td><td>Calendly API</td><td>Reading available time slots</td></tr>
+    <tr><td>Dashboard</td><td>Next.js</td><td>Provider admin UI</td></tr>
+    <tr><td>AI (edge only)</td><td>Ollama (llama3.2)</td><td>Speech normalisation, unclear input fallback</td></tr>
+    <tr><td>SMS</td><td>Twilio REST API</td><td>Booking confirmations, quote delivery, reminders</td></tr>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════ 2. COMPONENT BREAKDOWN -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Detailed Component Breakdown</h2>
+  </div>
+
+  <h3>Twilio — Why not just use a SIP server?</h3>
+  <p>Twilio abstracts the entire telephony infrastructure. Instead of managing SIP trunks, codecs,
+  and carrier agreements, you write a webhook. Twilio calls your URL on every keypress or speech event.
+  Alternatives like <strong>Vonage (Nexmo)</strong> or <strong>Plivo</strong> exist but Twilio has the
+  best developer experience, global coverage, and a generous trial tier.</p>
+
+  <table>
+    <tr><th>Twilio Concept</th><th>What it means</th></tr>
+    <tr><td>TwiML</td><td>XML dialect Twilio reads to control the call. You return it from your webhook.</td></tr>
+    <tr><td>&lt;Gather&gt;</td><td>Collects DTMF digits (keypad) or speech. Fires your webhook when done.</td></tr>
+    <tr><td>&lt;Say&gt;</td><td>Text-to-speech. Twilio reads it aloud to the caller.</td></tr>
+    <tr><td>&lt;Hangup&gt;</td><td>Ends the call.</td></tr>
+    <tr><td>CallSid</td><td>Unique ID for every call. Used to track state across multiple webhooks.</td></tr>
+    <tr><td>Twilio Signature</td><td>HMAC-SHA1 hash proving the request is genuinely from Twilio (security).</td></tr>
+  </table>
+
+  <h3>Node.js + Express — The Webhook Brain</h3>
+  <p>Every time a caller presses a key or speaks, Twilio sends a POST to <code>/webhook/twilio</code>.
+  Express handles it in milliseconds and returns TwiML. The state machine is implemented as a giant
+  <code>routeState()</code> function that reads <code>current_state</code> from the database and branches accordingly.</p>
+
+  <h3>PostgreSQL — Source of Truth</h3>
+  <p>Nine tables capture everything: businesses, services, customers, bookings, calls, booking events,
+  availability rules, notifications, and callback requests. Every state transition is persisted, so
+  if a caller hangs up and calls back, the system can resume correctly.</p>
+
+  <h3>n8n — Workflow Automation Without Code</h3>
+  <p>n8n is a visual workflow builder. It handles tasks that run outside the live call:
+  quote calculations, daily reminder emails, provider summaries at 4:30 PM, and booking confirmation emails.
+  These don't need sub-second latency so they're better outside the Express server.</p>
+
+  <h3>Calendly API — Availability Slots</h3>
+  <p>The system reads Calendly's scheduled events to determine available time slots. When a customer
+  calls, the system fetches the next available slots matching the requested service duration.
+  <strong>Limitation:</strong> Calendly's API is read-only — it cannot create events.
+  Bookings are stored in PostgreSQL only.</p>
+
+  <h3>Next.js Dashboard — Provider Admin</h3>
+  <p>A server-side rendered Next.js app giving the business owner visibility over all bookings,
+  calls, callbacks, and services. It connects directly to PostgreSQL — no intermediate API needed
+  since it's an internal tool.</p>
+</div>
+
+
+<!-- ══════════════════════════════════ 3. CALL FLOW -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Call Flow — Step by Step</h2>
+  </div>
+
+  <h3>Complete New Booking Flow</h3>
+  <div class="flow">Step 1: Customer calls +61 3 4708 4980
+  → Twilio answers the call, assigns a unique CallSid
+  → Twilio sends POST to https://your-server.com/webhook/twilio
+    Body: { CallSid: "CA123", From: "+61412345678", To: "+61347084980" }
+
+Step 2: Express receives webhook
+  → Validates Twilio HMAC signature (rejects if invalid)
+  → Looks up call by CallSid in `calls` table
+  → Not found → creates new call row, state = "LANGUAGE_MENU"
+  → Returns TwiML:
+    &lt;Gather numDigits="1" action="/webhook/twilio"&gt;
+      &lt;Say&gt;Welcome. For English press 1. Hindi ke liye 2...&lt;/Say&gt;
+    &lt;/Gather&gt;
+
+Step 3: Caller presses 1 (English)
+  → Twilio fires POST again: { Digits: "1", CallSid: "CA123" }
+  → Express reads state = "LANGUAGE_MENU", Digits = "1"
+  → Updates state to "MAIN_MENU_EN"
+  → Returns 6-option main menu TwiML
+
+Step 4: Caller presses 1 (New Booking)
+  → state = "MAIN_MENU_EN", Digits = "1"
+  → Sets context.intent = "new_booking"
+  → Updates state to "SERVICE_MENU_NEW"
+  → Returns service list TwiML
+
+Step 5: Caller presses 1 (Exterior Wash)
+  → Reads services from DB, maps keypad to service
+  → Stores serviceId, serviceName in call context (JSONB)
+  → Updates state to "COLLECT_REQUIRED_FIELDS"
+  → Asks: "For a Sedan press 1, SUV press 2..."
+
+Step 6: Caller presses 1 (Sedan), then 1 (Standard)
+  → Each answer stored in context JSONB
+  → Calls n8n quote-engine webhook with service + vehicle + condition
+  → n8n returns { quote_min: 290, quote_max: 410 }
+  → State → "QUOTE_RESULT"
+  → Reads: "Your quote is $290–$410. Press 1 for availability..."
+
+Step 7: Caller presses 1 (Check Availability)
+  → Calls POST /api/availability
+  → Fetches slots from Calendly API
+  → Generates multilingual spoken labels
+  → Returns top 3 slots: "For Tuesday May 5th at 9 AM, press 1..."
+
+Step 8: Caller presses 2 (selects 9 AM slot)
+  → Slot stored in context (slotStart, slotEnd)
+  → State → "CONFIRM_SLOT"
+  → "You selected Tuesday 9 AM. Press 1 to confirm..."
+
+Step 9: Caller presses 1 (Confirm)
+  → Conflict check: is this slot still free?
+  → POST /api/bookings → upserts customer, inserts booking
+  → Sends SMS confirmation via Twilio REST API
+  → State → "END_CALL"
+  → "Your booking is confirmed. Reference: abc-123. Goodbye!"
+
+Step 10: Twilio hangs up.</div>
+
+  <h3>What Happens if Two People Book the Same Slot?</h3>
+  <div class="box box-warn">
+    <strong>Race Condition — Handled by Conflict Check</strong>
+    Before inserting any booking, the system runs a SQL overlap query:
+    <code>scheduled_start &lt; $end AND scheduled_end &gt; $start AND status = 'confirmed'</code>.
+    If a conflict exists, a 409 is returned and the IVR routes the caller back to pick a different time.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ 4. SYSTEM DESIGN -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>System Design Concepts</h2>
+  </div>
+
+  <h3>Scalability — Handling Thousands of Calls</h3>
+  <table>
+    <tr><th>Challenge</th><th>Solution</th></tr>
+    <tr><td>Many simultaneous callers</td><td>Express is stateless per request — each webhook is independent. Scale horizontally with a load balancer.</td></tr>
+    <tr><td>Call state across requests</td><td>State stored in PostgreSQL (not in memory). Any server can handle any webhook.</td></tr>
+    <tr><td>DB connection limits</td><td>Connection pool (pg Pool) — max 10 connections shared across all requests.</td></tr>
+    <tr><td>Slow Calendly API</td><td>Cache availability results for 30–60 seconds; callers in that window share the same response.</td></tr>
+    <tr><td>n8n becoming a bottleneck</td><td>n8n handles async tasks (reminders, summaries) — never in the live call path for critical actions.</td></tr>
+  </table>
+
+  <h3>Fault Tolerance</h3>
+  <table>
+    <tr><th>Failure Scenario</th><th>How it's handled</th></tr>
+    <tr><td>Calendly API is down</td><td>Fallback: generate slots from <code>availability_rules</code> table stored in PostgreSQL</td></tr>
+    <tr><td>Calendly cancel fails</td><td>Best-effort — try to cancel, log error, continue. Booking is cancelled in DB regardless.</td></tr>
+    <tr><td>SMS fails to send</td><td>Booking is confirmed regardless. SMS failure is logged but doesn't block the caller.</td></tr>
+    <tr><td>DB is temporarily down</td><td>Express returns 500 → Twilio reads it as error, plays a generic "please try again" message</td></tr>
+    <tr><td>Caller hangs up mid-flow</td><td>State is persisted at each step. If they call back, system resumes from last known state.</td></tr>
+    <tr><td>Twilio signature invalid</td><td>Middleware returns 403 — rejects the request before any state is changed</td></tr>
+  </table>
+
+  <h3>Latency Optimization</h3>
+  <ul>
+    <li>Twilio expects a TwiML response within <strong>15 seconds</strong> — anything slower causes a timeout.</li>
+    <li>Most state transitions only hit the DB (single query) — sub-100ms response time.</li>
+    <li>Calendly API call (~300ms) only happens at the CHECK_AVAILABILITY state, not every webhook.</li>
+    <li>n8n quote engine call (~200ms) only at COLLECT_REQUIRED_FIELDS completion.</li>
+    <li>Database indexes on <code>call_sid</code>, <code>caller_phone</code>, <code>status</code>, <code>scheduled_start</code> ensure fast lookups.</li>
+  </ul>
+
+  <h3>Database Design — Why PostgreSQL over MongoDB?</h3>
+  <div class="box box-info">
+    Booking data is <strong>relational</strong>: a booking belongs to a customer, references a service,
+    and belongs to a business. ACID transactions ensure that a booking is never half-written.
+    The JSONB <code>context</code> column on the <code>calls</code> table gives us document-like flexibility
+    for accumulating call state without schema changes.
+  </div>
+
+  <h3>Queue Systems</h3>
+  <p>This system does <em>not</em> use a message queue (Redis/RabbitMQ) for the live call path because
+  Twilio's webhook model is already asynchronous — each keypress is its own HTTP request. However,
+  for a high-scale production system, reminder jobs should be moved to a queue (Bull + Redis)
+  to decouple them from the n8n scheduler.</p>
+</div>
+
+
+<!-- ══════════════════════════════════ 5. BACKEND DESIGN -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Backend Design</h2>
+  </div>
+
+  <h3>API Structure</h3>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+    <tr><td>POST</td><td>/webhook/twilio</td><td>Main Twilio webhook — all call events</td></tr>
+    <tr><td>GET</td><td>/health</td><td>DB connectivity check</td></tr>
+    <tr><td>GET</td><td>/api/services/:businessId</td><td>List active services for a business</td></tr>
+    <tr><td>POST</td><td>/api/availability</td><td>Fetch top 3 available slots from Calendly</td></tr>
+    <tr><td>POST</td><td>/api/bookings</td><td>Create a new confirmed booking</td></tr>
+    <tr><td>GET</td><td>/api/bookings/phone/:phone</td><td>Find future bookings by caller phone</td></tr>
+    <tr><td>POST</td><td>/api/bookings/:id/cancel</td><td>Cancel a booking</td></tr>
+    <tr><td>PUT</td><td>/api/bookings/:id/reschedule</td><td>Move booking to a new time slot</td></tr>
+  </table>
+
+  <h3>Webhook Handler — Core Logic</h3>
+  <pre>// Every Twilio event hits this handler
+router.post('/', validateTwilio, async (req, res) => {
+  const { CallSid, From, To, Digits, SpeechResult } = req.body;
+
+  // 1. Find or create the call record
+  let call = await pool.query(
+    'SELECT * FROM calls WHERE call_sid = $1', [CallSid]
+  );
+  if (!call.rows.length) {
+    call = await createNewCall(CallSid, From, To);
+  }
+
+  const state   = call.rows[0].current_state;  // e.g. "LANGUAGE_MENU"
+  const context = call.rows[0].context;         // JSONB accumulation
+
+  // 2. Convert speech to DTMF if needed
+  const selected = mapSpeechToDigit(SpeechResult, state) || Digits;
+
+  // 3. Route to correct state handler
+  const twiml = await routeState(state, selected, context, call.rows[0]);
+
+  // 4. Return TwiML XML
+  res.set('Content-Type', 'text/xml');
+  res.send(twiml);
+});</pre>
+
+  <h3>State Machine Pattern</h3>
+  <pre>async function routeState(state, selected, context, callRecord) {
+  switch (state) {
+    case 'LANGUAGE_MENU':
+      if (selected === '1') return transitionTo('MAIN_MENU_EN', callRecord);
+      if (selected === '2') return transitionTo('MAIN_MENU_HI', callRecord);
+      if (selected === '3') return transitionTo('MAIN_MENU_ZH', callRecord);
+      return repeatMenu(state); // invalid input → repeat
+
+    case 'MAIN_MENU_EN':
+      if (selected === '1') return transitionTo('SERVICE_MENU_NEW', callRecord, { intent: 'new_booking' });
+      if (selected === '2') return transitionTo('SERVICE_MENU_NEW', callRecord, { intent: 'check_availability' });
+      // ... etc
+  }
+}</pre>
+
+  <h3>Database Schema Highlights</h3>
+  <pre>-- Core tables
+CREATE TABLE calls (
+  call_id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  call_sid      TEXT UNIQUE NOT NULL,        -- Twilio's ID
+  business_id   UUID REFERENCES businesses,
+  caller_phone  TEXT,
+  current_state TEXT DEFAULT 'LANGUAGE_MENU',
+  context       JSONB DEFAULT '{}',          -- accumulated call data
+  started_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE bookings (
+  booking_id      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id     UUID REFERENCES businesses,
+  customer_id     UUID REFERENCES customers,
+  service_id      UUID REFERENCES services,
+  scheduled_start TIMESTAMPTZ NOT NULL,
+  scheduled_end   TIMESTAMPTZ NOT NULL,
+  status          TEXT DEFAULT 'confirmed',   -- confirmed | cancelled
+  quote_min       INTEGER,
+  quote_max       INTEGER,
+  suburb          TEXT
+);</pre>
+
+  <h3>Security: Twilio Signature Validation</h3>
+  <pre>// middleware/twilioValidation.js
+const twilio = require('twilio');
+
+module.exports = (req, res, next) => {
+  const signature = req.headers['x-twilio-signature'];
+  const url       = process.env.WEBHOOK_BASE_URL + '/webhook/twilio';
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  // Twilio signs every request with HMAC-SHA1
+  if (!twilio.validateRequest(authToken, signature, url, req.body)) {
+    return res.status(403).send('Forbidden');
+  }
+  next();
+};</pre>
+  <div class="box box-warn">
+    <strong>Why this matters in interviews</strong>
+    Without signature validation, anyone who discovers your webhook URL can send fake calls
+    and create bogus bookings. This is a classic security question interviewers ask.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ 6. AI INTEGRATION -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>AI Integration — Ollama (Planned Layer)</h2>
+  </div>
+
+  <div class="box box-info">
+    <strong>Honest project note</strong>
+    Ollama is architected into the system but the current implementation uses keyword-regex matching
+    instead. This is intentional — regex handles 95% of cases with zero latency. Ollama would add
+    value for ambiguous multilingual input and truly off-script conversations.
+  </div>
+
+  <h3>What Ollama Does (and Why Local AI)</h3>
+  <p>Ollama runs a local LLM (e.g. <code>llama3.2</code>) on the server, with no API calls to OpenAI.
+  This means zero per-token cost, no data leaving the server, and predictable latency.
+  For a small business IVR system, this is the right tradeoff.</p>
+
+  <h3>Current Implementation: Keyword Regex</h3>
+  <pre>// Speech → DTMF mapping (deterministic, zero latency)
+function mapSpeechToDigit(speech, state) {
+  if (!speech) return null;
+  const s = speech.toLowerCase();
+
+  if (['MAIN_MENU_EN', 'MAIN_MENU_HI', 'MAIN_MENU_ZH'].includes(state)) {
+    if (/\b(book|new booking|appointment)\b/.test(s))            return '1';
+    if (/\b(availab|when|time|open|slot)\b/.test(s))             return '2';
+    if (/\b(quote|price|cost|how much|estimate)\b/.test(s))      return '3';
+    if (/\b(change|reschedule|move|different time)\b/.test(s))   return '4';
+    if (/\b(cancel)\b/.test(s))                                  return '5';
+    if (/\b(callback|call back|call me|message)\b/.test(s))      return '6';
+  }
+  return null; // unrecognised → repeat menu
+}</pre>
+
+  <h3>Ollama Integration (How it Would Work)</h3>
+  <pre>// services/ollamaService.js
+async function normaliseIntent(speechText, currentState, language) {
+  const prompt = `
+    The caller said: "${speechText}"
+    Current IVR state: ${currentState}
+    Language: ${language}
+
+    Map this to one of these intents:
+    1=new_booking, 2=check_availability, 3=get_quote,
+    4=reschedule, 5=cancel, 6=callback, 9=repeat
+
+    Respond with only the digit. If unclear, respond with "unclear".
+  `;
+
+  const response = await fetch('http://localhost:11434/api/generate', {
+    method: 'POST',
+    body: JSON.stringify({ model: 'llama3.2', prompt, stream: false })
+  });
+
+  const data = await response.json();
+  return data.response.trim(); // returns "1", "2" ... or "unclear"
+}</pre>
+
+  <h3>Prompt Engineering Basics</h3>
+  <ul>
+    <li><strong>Be specific about output format</strong> — ask for exactly a digit, not a sentence</li>
+    <li><strong>Give context</strong> — tell the model what state the caller is in</li>
+    <li><strong>Handle "unclear"</strong> — always have a fallback when the model is not confident</li>
+    <li><strong>Temperature = 0</strong> — for classification tasks, you want deterministic output</li>
+  </ul>
+
+  <h3>Handling AI Delays</h3>
+  <div class="box box-warn">
+    <strong>Latency Problem</strong>
+    Ollama on a small server takes 1–3 seconds to respond. Twilio expects a response within 15 seconds,
+    but the caller experience degrades past 2 seconds of silence.
+    Solution: play a "Please hold..." &lt;Say&gt; while the AI processes, or use regex first and
+    only fall back to Ollama for unrecognised input.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ 7. N8N WORKFLOWS -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>n8n Workflows</h2>
+  </div>
+
+  <h3>What is n8n?</h3>
+  <p>n8n is a self-hosted workflow automation tool — think Zapier but open source and code-capable.
+  Each workflow is a visual pipeline of nodes: webhooks, HTTP requests, code blocks, email senders, etc.</p>
+
+  <h3>Workflow 1: Quote Engine</h3>
+  <div class="flow">Trigger: POST /webhook/quote-engine
+  Input: { service, vehicleType, condition, suburb }
+         │
+         ▼
+  [Code Node] — deterministic pricing rules
+    Exterior Wash, Sedan, Standard → base $290
+    + heavy condition surcharge $40
+    + SUV surcharge $60
+    → { quote_min: 290, quote_max: 410 }
+         │
+         ▼
+  [Respond to Webhook] → returns JSON to Express</div>
+
+  <h3>Workflow 2: Quote + Availability (Combined)</h3>
+  <div class="flow">Trigger: POST /webhook/quote-and-availability
+  Input: { service, vehicleType, condition, startDate, endDate }
+         │
+         ├──► [HTTP Request] → quote-engine webhook
+         │         returns { quote_min, quote_max }
+         │
+         └──► [HTTP Request] → POST /api/availability
+                   returns top 3 Calendly slots
+         │
+         ▼
+  [Code Node] — combine quote + slots
+         │
+         ▼
+  [Respond to Webhook] → { quote_min, quote_max, slots[] }</div>
+
+  <h3>Workflow 3: Customer Reminder (Scheduled)</h3>
+  <div class="flow">Trigger: Cron — every hour
+         │
+         ▼
+  [PostgreSQL] — find bookings starting in 23–25 hours
+  WHERE scheduled_start BETWEEN NOW() + 23h AND NOW() + 25h
+  AND status = 'confirmed'
+         │
+         ▼
+  [Loop] for each booking:
+    [Twilio SMS] → "Reminder: your Exterior Wash is tomorrow at 9 AM"
+    [PostgreSQL] → INSERT INTO notification_log</div>
+
+  <h3>Workflow 4: Provider Daily Summary (4:30 PM)</h3>
+  <div class="flow">Trigger: Cron — daily at 16:30 AEST
+         │
+         ▼
+  [PostgreSQL] — tomorrow's confirmed bookings
+         │
+         ▼
+  [Code Node] — format email: count, services, total quote range
+         │
+         ▼
+  [Email / SMTP] → provider@shinemobiledetailing.com.au</div>
+
+  <h3>Why n8n Instead of Writing More Express Routes?</h3>
+  <table>
+    <tr><th>Concern</th><th>n8n Advantage</th></tr>
+    <tr><td>Scheduled jobs</td><td>Built-in cron trigger, no need for node-cron or separate scheduler</td></tr>
+    <tr><td>Non-developer changes</td><td>Business owner can update email templates without touching code</td></tr>
+    <tr><td>Retries</td><td>n8n retries failed nodes automatically</td></tr>
+    <tr><td>Visibility</td><td>Every workflow execution is logged with inputs/outputs</td></tr>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════ 8. INTERVIEW Q&A -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Common Interview Questions &amp; Strong Answers</h2>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q1. Walk me through what happens when a customer calls your system.</div>
+    <div class="answer">
+      "When the customer calls, Twilio answers the call and immediately sends a POST request to our
+      Express webhook. We validate the request using Twilio's HMAC signature to ensure it's genuine.
+      Then we look up the CallSid in our calls table — if it's a new call, we create a record with
+      state LANGUAGE_MENU. We return TwiML telling Twilio to play our greeting and wait for a keypress.
+      Each subsequent keypress fires another webhook, and we read the stored state to decide what to do next.
+      The entire conversation is a series of stateless HTTP requests tied together by the CallSid."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q2. How do you handle concurrent bookings — what if two users try to book the same slot?</div>
+    <div class="answer">
+      "We handle this with a conflict check before every INSERT. The SQL query checks for any confirmed
+      booking where <code>scheduled_start &lt; new_end AND scheduled_end &gt; new_start</code> — this is the
+      standard interval overlap condition. If a conflict is found, we return a 409 and the IVR routes
+      the caller back to choose a different time. This is not a perfect distributed lock, but it's safe
+      enough for a single-region deployment with PostgreSQL's row-level locking. For true multi-region scale,
+      we'd use a pessimistic lock or a booking token pattern."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q3. Why did you choose PostgreSQL over MongoDB for this project?</div>
+    <div class="answer">
+      "Booking data is inherently relational — a booking has a customer, a service, and a business.
+      We need ACID guarantees so a booking is never half-written. PostgreSQL also supports JSONB, which
+      we use for the call's accumulated context — vehicle type, condition, selected slot — without
+      needing schema migrations for every new field. We get relational integrity where we need it
+      and document flexibility where we don't."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q4. What happens if your server is down when Twilio sends a webhook?</div>
+    <div class="answer">
+      "Twilio will retry the webhook a few times with exponential backoff. Our server also has a
+      /health endpoint that we can use for uptime monitoring. For production, the backend should be
+      deployed with at least two instances behind a load balancer so there's no single point of failure.
+      Because call state is in the database (not in memory), any instance can handle any webhook from
+      any caller."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q5. How did you secure the webhook endpoint?</div>
+    <div class="answer">
+      "Every request from Twilio includes an X-Twilio-Signature header — an HMAC-SHA1 hash of the
+      URL and POST body, signed with our auth token. Our middleware recomputes this hash and compares
+      it. If they don't match, we return 403 immediately. This prevents anyone who discovers the URL
+      from sending fake call events."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q6. How does the system support three languages?</div>
+    <div class="answer">
+      "The language is captured in the first step (LANGUAGE_MENU) and stored in the call context JSONB.
+      Every subsequent state handler reads <code>context.language</code> to decide which TwiML to return.
+      The availability slot labels are generated by a dedicated service that formats dates in English,
+      Hindi, and Mandarin. For Hindi and Mandarin, Twilio's &lt;Say language&gt; attribute is set to
+      <code>hi-IN</code> or <code>zh-CN</code> so the TTS engine pronounces the words correctly."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q7. Why did you use n8n instead of writing everything in Express?</div>
+    <div class="answer">
+      "We separated concerns deliberately. The Express server must respond to Twilio within 15 seconds —
+      it's latency-sensitive. Background tasks like reminder scheduling, email summaries, and multi-step
+      notification pipelines don't belong in the critical path. n8n handles those asynchronously with
+      built-in cron, retry logic, and a visual audit trail. It also means non-developers can tweak
+      reminder timing or email templates without touching the backend code."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q8. How would you scale this to 10,000 simultaneous calls?</div>
+    <div class="answer">
+      "Three areas: First, Express is stateless — horizontal scaling with a load balancer is straightforward
+      because all state lives in PostgreSQL. Second, the database becomes the bottleneck — we'd use a
+      read replica for lookups, connection pooling via PgBouncer, and caching availability results in Redis.
+      Third, n8n reminder jobs would move to a proper queue (Bull + Redis) so thousands of SMS jobs
+      don't pile up on one n8n instance."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q9. What is TwiML and how does it work?</div>
+    <div class="answer">
+      "TwiML stands for Twilio Markup Language — it's XML that Twilio reads to control a call.
+      When Twilio sends a webhook to our server, it expects us to respond with TwiML within 15 seconds.
+      The most common verbs are &lt;Say&gt; (text-to-speech), &lt;Gather&gt; (collect DTMF or speech),
+      and &lt;Hangup&gt; (end the call). Our &lt;Gather&gt; element has an action URL — when the caller
+      presses a key, Twilio POSTs their input to that URL, which fires our webhook handler again."
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">Q10. What would you do differently if you were building this again?</div>
+    <div class="answer">
+      "A few things. First, I'd store timestamps as TIMESTAMPTZ from day one — we had a 5.5-hour
+      timezone bug because PostgreSQL was storing TIMESTAMP WITHOUT TIME ZONE and the Node.js pg driver
+      was interpreting it as local machine time. Second, I'd add a Redis cache for availability slots
+      to reduce Calendly API calls. Third, I'd containerise with Docker from the start so local dev
+      matches production exactly."
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ 9. RESUME -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Resume Explanation</h2>
+  </div>
+
+  <h3>Resume Bullet Points</h3>
+  <div class="box box-success">
+    <ul class="resume-bullets">
+      <li>• Built an end-to-end automated voice booking system using Node.js, Twilio, PostgreSQL, and n8n, enabling small businesses to handle bookings, cancellations, and rescheduling via phone without a human operator</li>
+      <li>• Designed a stateful IVR call engine with 15+ states, supporting DTMF and speech input across English, Hindi, and Mandarin</li>
+      <li>• Implemented booking conflict detection using SQL interval overlap queries and integrated Twilio REST API for SMS confirmation delivery</li>
+      <li>• Built 7 n8n automation workflows including quote engine, availability engine, and scheduled reminder pipelines</li>
+      <li>• Developed a Next.js provider dashboard with live data from PostgreSQL covering bookings, call logs, services, and callbacks</li>
+      <li>• Diagnosed and resolved a PostgreSQL TIMESTAMP timezone bug caused by the Node.js pg driver interpreting UTC timestamps as IST (UTC+5:30)</li>
+    </ul>
+  </div>
+
+  <h3>60-Second Verbal Explanation</h3>
+  <div class="resume-box">
+    "I built an automated voice booking system for service businesses — imagine a car detailing company
+    where customers call a number and can book, reschedule, or cancel appointments entirely through
+    keypad and voice, without talking to a person.
+
+    The core is a Node.js Express server that receives webhooks from Twilio on every keypress.
+    It reads the call's current state from PostgreSQL — things like which language they chose, which
+    service they want, which slot they selected — and returns TwiML XML telling Twilio what to say next.
+
+    For the business logic, I used n8n workflows for quote calculation, availability checking via the
+    Calendly API, and scheduled reminders. The frontend is a Next.js dashboard where the business
+    owner can see all bookings, calls, and callbacks.
+
+    One interesting challenge was a timezone bug — bookings were being stored 5 and a half hours off.
+    I traced it to the Node.js PostgreSQL driver treating timestamp-without-timezone columns as local
+    machine time instead of UTC. I fixed it by overriding the type parser to force UTC interpretation.
+
+    The system handles three languages, has security via Twilio HMAC signature validation, and is
+    deployed on Render with a PostgreSQL database."
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════ 10. ADVANCED -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>Advanced Improvements</h2>
+  </div>
+
+  <table>
+    <tr><th>Improvement</th><th>How</th><th>Benefit</th></tr>
+    <tr>
+      <td>Real-time speech-to-text</td>
+      <td>Use Twilio Media Streams + Deepgram or Google Speech-to-Text for streaming transcription</td>
+      <td>Faster response, better accuracy for accents</td>
+    </tr>
+    <tr>
+      <td>Outbound reminder calls</td>
+      <td>Twilio Calls API — trigger a call to the customer 2 hours before appointment</td>
+      <td>Higher show-up rate than SMS</td>
+    </tr>
+    <tr>
+      <td>WhatsApp channel</td>
+      <td>Twilio WhatsApp API — same state machine, different transport</td>
+      <td>Reach customers who prefer messaging</td>
+    </tr>
+    <tr>
+      <td>Slot caching</td>
+      <td>Redis with 60-second TTL on Calendly responses</td>
+      <td>Eliminates redundant API calls under load</td>
+    </tr>
+    <tr>
+      <td>Analytics dashboard</td>
+      <td>Add call outcome tracking, drop-off state analysis, conversion rates by service</td>
+      <td>Business insights, optimise IVR prompts</td>
+    </tr>
+    <tr>
+      <td>Caller personalisation</td>
+      <td>On call start, look up repeat customer — "Welcome back, David. Book the same Exterior Wash?"</td>
+      <td>Faster flow, better experience</td>
+    </tr>
+    <tr>
+      <td>Ollama for off-script</td>
+      <td>Route truly unrecognised speech to local LLM for intent extraction</td>
+      <td>Handle unexpected inputs gracefully</td>
+    </tr>
+    <tr>
+      <td>Multi-business SaaS</td>
+      <td>Every table already has business_id — add a subscription layer and onboarding flow</td>
+      <td>One codebase serves N businesses</td>
+    </tr>
+    <tr>
+      <td>Dockerise + CI/CD</td>
+      <td>Docker Compose for local dev, GitHub Actions for deploy to Render</td>
+      <td>Reproducible environments, automated deployments</td>
+    </tr>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════ 11. MISTAKES -->
+<div class="section page-break">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <h2>Common Fresher Mistakes When Explaining This Project</h2>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>"I built a voice calling app using Twilio."</strong><br/>
+      Too vague. Interviewers hear this every day. Be specific:
+      <em>"I built a stateful IVR system where call state is persisted in PostgreSQL across multiple Twilio webhook requests."</em>
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Listing technologies without explaining why.</strong><br/>
+      Don't say "I used n8n." Say "I used n8n for scheduled background tasks to keep them out of the
+      latency-sensitive webhook path."
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Not knowing your own bug fixes.</strong><br/>
+      Interviewers love "what was the hardest bug?" Prepare the timezone story — it shows
+      you understand how PostgreSQL, Node.js, and timezones interact at a systems level.
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Claiming AI does more than it does.</strong><br/>
+      Don't say "I used AI to understand speech" if you used regex. It's fine to say
+      "I used keyword matching for now, with Ollama designed in as the next layer."
+      Honesty + a plan is stronger than overclaiming.
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Ignoring security.</strong><br/>
+      Always mention Twilio signature validation when explaining the webhook. It shows
+      you think about attack surfaces, not just happy paths.
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Not knowing the database schema.</strong><br/>
+      Be ready to draw the ER diagram from memory — businesses → services, bookings,
+      calls; customers → bookings; booking_events as audit log.
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Saying "it scales horizontally" without knowing what that means.</strong><br/>
+      Explain that Express is stateless (state is in DB), so you can run multiple instances
+      behind a load balancer without sticky sessions.
+    </div>
+  </div>
+
+  <div class="mistake">
+    <div class="icon">❌</div>
+    <div>
+      <strong>Not mentioning the 15-second Twilio constraint.</strong><br/>
+      Every design decision (why DB indexes matter, why n8n is async, why regex beats Ollama
+      for live calls) traces back to this constraint. Lead with it.
+    </div>
+  </div>
+
+  <div class="box box-success box-golden">
+    <strong>Golden Rule for Interviews</strong>
+    Every answer should follow: What → Why → Trade-off → What you'd do differently.
+    This structure shows engineering maturity, not just implementation knowledge.
+  </div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

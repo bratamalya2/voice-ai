@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import { format } from "date-fns";
+import { revalidatePath } from "next/cache";
 import { MessageSquare, CheckCircle2, Clock } from "lucide-react";
 
 async function getCallbacks() {
@@ -9,6 +10,16 @@ async function getCallbacks() {
     ORDER BY created_at DESC
   `);
   return result.rows;
+}
+
+async function resolveCallback(formData) {
+  "use server";
+  const id = formData.get("id");
+  await query(
+    `UPDATE callback_requests SET status = 'resolved' WHERE callback_id = $1`,
+    [id]
+  );
+  revalidatePath("/callbacks");
 }
 
 export default async function CallbacksPage() {
@@ -59,9 +70,16 @@ export default async function CallbacksPage() {
                     </span>
                   </td>
                   <td>
-                    <button className="btn" style={{ fontSize: '0.75rem', backgroundColor: 'var(--accent)', color: 'white' }}>
-                      Mark Resolved
-                    </button>
+                    {cb.status !== 'resolved' ? (
+                      <form action={resolveCallback}>
+                        <input type="hidden" name="id" value={cb.callback_id} />
+                        <button type="submit" className="btn" style={{ fontSize: '0.75rem', backgroundColor: 'var(--accent)', color: 'white' }}>
+                          Mark Resolved
+                        </button>
+                      </form>
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Done</span>
+                    )}
                   </td>
                 </tr>
               ))}

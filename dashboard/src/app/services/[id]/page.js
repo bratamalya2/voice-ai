@@ -20,8 +20,8 @@ async function updateService(formData) {
   const active = formData.get("active") === "on";
 
   await query(
-    `UPDATE services 
-     SET name_en = $1, duration_minutes = $2, base_price_min = $3, base_price_max = $4, active = $5, updated_at = NOW()
+    `UPDATE services
+     SET name_en = $1, duration_minutes = $2, base_price_min = $3, base_price_max = $4, active = $5
      WHERE service_id = $6`,
     [name_en, duration, price_min, price_max, active, id]
   );

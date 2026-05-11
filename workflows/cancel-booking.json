@@ -17,7 +17,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ 'https://5f00-49-37-46-115.ngrok-free.app/api/bookings/' + ($json.body || $json).bookingId + '/cancel' }}",
+        "url": "={{ 'https://armhole-feeble-vixen.ngrok-free.dev/api/bookings/' + ($json.body || $json).bookingId + '/cancel' }}",
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",

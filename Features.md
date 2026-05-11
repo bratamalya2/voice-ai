@@ -2,9 +2,9 @@
 
 > Blueprint: `Voice Booking Agent Blueprint.pdf`
 > Implementation guide: `ai_voice_booking_implementation_guide.pdf`
-> Last reviewed: 2026-04-29
+> Last reviewed: 2026-05-03
 
-Legend: ✅ Implemented · ⬜ Not started
+Legend: ✅ Implemented · ⬜ Not started · ⚠️ Stub (wired but non-functional)
 
 ---
 
@@ -117,19 +117,19 @@ Legend: ✅ Implemented · ⬜ Not started
 | #    | State                                                                         | Status | Notes                             |
 | ---- | ----------------------------------------------------------------------------- | ------ | --------------------------------- |
 | 3.1  | `LANGUAGE_MENU` (English / Hindi / Mandarin / 9=repeat)                       | ✅     | In `backend/src/routes/twilio.js` |
-| 3.2  | `MAIN_MENU_EN`                                                                | ✅     |                                   |
-| 3.3  | `MAIN_MENU_HI`                                                                | ✅     |                                   |
-| 3.4  | `MAIN_MENU_ZH`                                                                | ✅     |                                   |
+| 3.2  | `MAIN_MENU_EN`                                                                | ✅     | All 6 options wired; options 2/3/4/6 implemented |
+| 3.3  | `MAIN_MENU_HI`                                                                | ✅     | All 6 options wired |
+| 3.4  | `MAIN_MENU_ZH`                                                                | ✅     | All 6 options wired |
 | 3.5  | `SERVICE_MENU_NEW` (dynamic from services table)                              | ✅     | Implemented in `backend/src/routes/twilio.js` |
 | 3.6  | `COLLECT_REQUIRED_FIELDS` (one field at a time)                               | ✅     | Implemented in `backend/src/routes/twilio.js` using JSONB context |
-| 3.7  | `QUOTE_RESULT` (reads range; 1=check availability, 2=send quote, 3=main menu) | ✅     | Implemented in `backend/src/routes/twilio.js` |
+| 3.7  | `QUOTE_RESULT` (reads range; 1=check availability, 2=send quote, 3=main menu) | ✅     | SMS sent via Twilio REST client; logged to `notification_log` |
 | 3.8  | `CHECK_AVAILABILITY` (3 slots; 1/2/3=select, 4=more, 9=repeat)                | ✅     | Fetches from Calendly + Multilingual labels |
 | 3.9  | `CONFIRM_SLOT` (1=confirm, 2=other times, 3=cancel request)                   | ✅     |                                   |
 | 3.10 | `CREATE_BOOKING`                                                              | ✅     | Calls /api/bookings and confirms  |
 | 3.11 | `IDENTIFY_BOOKING_CANCEL`                                                     | ✅     | Looks up by phone via /api/bookings/phone |
 | 3.12 | `CANCEL_CONFIRM` (1=cancel, 2=keep, 3=hear details)                           | ✅     |                                   |
 | 3.13 | `CANCEL_BOOKING`                                                              | ✅     | Calls /api/bookings/:id/cancel     |
-| 3.14 | `CALLBACK_REQUEST`                                                            | ✅     | Logs intent and confirms          |
+| 3.14 | `CALLBACK_REQUEST`                                                            | ✅     | State implemented; collects speech reason, INSERTs into `callback_requests` |
 | 3.15 | `END_CALL`                                                                    | ✅     |                                   |
 | 3.16 | `current_state` stored in `calls` table, updated on every transition          | ✅     | Tested and verified               |
 | 3.17 | Both DTMF digits and `SpeechResult` parsed                                    | ✅     | Speech fallback in `routeState()` |
@@ -160,9 +160,9 @@ Legend: ✅ Implemented · ⬜ Not started
 
 | #    | Feature                                         | Status |
 | ---- | ----------------------------------------------- | ------ |
-| 3.30 | Recheck slot availability before writing        | ✅     | Done via Calendly conflict check     |
+| 3.30 | Recheck slot availability before writing        | ✅     | Conflict check against confirmed bookings before INSERT; returns 409 + re-routes to new slot |
 | 3.31 | Insert booking row in PostgreSQL                | ✅     | `POST /api/bookings` — upserts customer, inserts booking |
-| 3.32 | Create Calendly event, save `calendar_event_id` | ✅     | Best-effort in `POST /api/bookings` — non-fatal if fails |
+| 3.32 | Create Calendly event, save `calendar_event_id` | ⬜     | Calendly API does not support creating events — not implementable |
 | 3.33 | Log booking event in `booking_events`           | ✅     | `booking_created` event logged on every booking |
 | 3.34 | Send provider confirmation email                | ✅     | Done via n8n reminders               |
 | 3.35 | Send customer confirmation email                | ✅     | Done via n8n reminders               |
@@ -185,9 +185,9 @@ Legend: ✅ Implemented · ⬜ Not started
 
 | #    | Feature                           | Status |
 | ---- | --------------------------------- | ------ |
-| 3.43 | Collect spoken callback reason    | ✅     | In `CALLBACK_REQUEST` state          |
-| 3.44 | Save to `callback_requests` table | ✅     |                                      |
-| 3.45 | Notify provider by email          | ✅     | Visible on Dashboard                 |
+| 3.43 | Collect spoken callback reason    | ✅     | Collected via `gatherSpeechResponse()` in `CALLBACK_REQUEST` state |
+| 3.44 | Save to `callback_requests` table | ✅     | INSERTs caller phone + spoken reason + timestamp into `callback_requests` |
+| 3.45 | Notify provider by email          | ⬜     | No email notification on callback save — provider sees callbacks in dashboard |
 
 ---
 
@@ -248,19 +248,19 @@ Legend: ✅ Implemented · ⬜ Not started
 
 | #    | Feature                                      | Status |
 | ---- | -------------------------------------------- | ------ |
-| 4.27 | Identify booking to reschedule               | ✅     | Via `IDENTIFY_BOOKING` in IVR / Web |
-| 4.28 | Generate next available slots                | ✅     | Integrated with Calendly API        |
-| 4.29 | Confirm selected slot with caller            | ✅     | IVR state + Web confirmation        |
-| 4.30 | Update booking row and Google Calendar event | ✅     | `/api/bookings/:id/reschedule` endpoint |
-| 4.31 | Notify provider and customer of reschedule   | ✅     | Triggered by DB update               |
+| 4.27 | Identify booking to reschedule               | ✅     | `IDENTIFY_BOOKING_RESCHEDULE` state looks up booking by caller phone |
+| 4.28 | Generate next available slots                | ✅     | Reuses `CHECK_AVAILABILITY` state with `context.intent = 'reschedule'` |
+| 4.29 | Confirm selected slot with caller            | ✅     | Reuses `CONFIRM_SLOT` state; branches to `RESCHEDULE_BOOKING` on confirm |
+| 4.30 | Update booking row and Google Calendar event | ✅     | `PUT /api/bookings/:id/reschedule` — updates DB row + logs event; Google Calendar not supported |
+| 4.31 | Notify provider and customer of reschedule   | ⬜     | No SMS/email notification sent on reschedule — post-MVP |
 
 ### AI Fallback Layer (Ollama — post-MVP)
 
 | #    | Feature                                             | Status |
 | ---- | --------------------------------------------------- | ------ |
-| 4.32 | Multilingual speech normalisation (Hindi, Mandarin) | ✅     | Done via Twilio `Language` params   |
-| 4.33 | Transcript cleanup for unclear speech               | ✅     |                                     |
-| 4.34 | Off-script fallback handling                        | ✅     |                                     |
+| 4.32 | Multilingual speech normalisation (Hindi, Mandarin) | ✅     | Basic: Twilio language params + keyword matching in `routeState()`; no Ollama |
+| 4.33 | Transcript cleanup for unclear speech               | ✅     | Keyword regex matching handles common speech variants across all states; no Ollama needed |
+| 4.34 | Off-script fallback handling                        | ✅     | Unrecognised input re-prompts the current menu state rather than silently failing |
 
 ### Testing & Handover
 
@@ -282,9 +282,9 @@ Legend: ✅ Implemented · ⬜ Not started
 | Week 1 — Foundation & Schema             | 25      | 25      | 0           | 0         |
 | Backend Express Server                   | 6       | 6       | 0           | 0         |
 | Week 2 — Quote & Availability            | 14      | 14      | 0           | 0         |
-| Week 3 — IVR, Booking & Cancellation     | 47      | 47      | 0           | 0         |
-| Week 4 — Reminders, Dashboard & Handover | 40      | 40      | 0           | 0         |
-| **Total**                                | **132** | **132** | **0**       | **0**     |
+| Week 3 — IVR, Booking & Cancellation     | 47      | 45      | 0           | 2         |
+| Week 4 — Reminders, Dashboard & Handover | 40      | 39      | 0           | 1         |
+| **Total**                                | **132** | **129** | **0**       | **3**     |
 
 > 🔄 = in progress (partially done)
 
@@ -296,17 +296,20 @@ Legend: ✅ Implemented · ⬜ Not started
 - Express backend: `/health`, `/webhook/twilio`, Twilio signature validation, PostgreSQL pool
 - Backend booking APIs: `GET /api/services/:businessId`, `POST /api/bookings`, `GET /api/bookings/phone/:phone`, `POST /api/bookings/:id/cancel`
 - n8n deployed on Render (`n8n-service-4jb2.onrender.com`), hello-world webhook verified
-- **Full IVR state machine**: `LANGUAGE_MENU` through `CREATE_BOOKING` and `CANCEL_BOOKING` — tested and working end-to-end
-- Stateful call tracking, DTMF + speech parsing, key-9 repeat, dynamic service menus, field collection, and real-time quote generation
-- **Calendly service** (`calendlyService.js`): Integration for availability and automated event management
-- **n8n Workflows**: `quote-engine`, `quote-and-availability`, `create-booking`, `cancel-booking` — all live and tested
-- **Customer & Provider Reminders**: n8n workflows for automated SMS/Email reminders 24h before bookings
-- **Daily Provider Summary**: n8n workflow for automated revenue/schedule summary every afternoon
-- **Provider Dashboard**: Next.js app with real-time stats, bookings list, call logs, and callback management UI ✅
+- **Core IVR state machine**: all 6 main menu options wired — new booking, check availability (option 2), quote only (option 3), reschedule (option 4), cancel (option 5), callback request (option 6)
+- Stateful call tracking, DTMF + speech parsing, key-9 repeat, dynamic service menus, multilingual slot labels
+- **Reschedule engine**: `IDENTIFY_BOOKING_RESCHEDULE` → `CHECK_AVAILABILITY` → `CONFIRM_SLOT` → `RESCHEDULE_BOOKING`; `PUT /api/bookings/:id/reschedule` with conflict check
+- **Callback request flow**: `CALLBACK_REQUEST` state collects free-speech reason via `gatherSpeechResponse()`, saves to `callback_requests` table
+- **Speech fallback**: keyword regex mapping from spoken intent to DTMF equivalent across all IVR states
+- **SMS quote delivery**: `QUOTE_RESULT` option 2 sends real SMS via Twilio REST client, logged to `notification_log`
+- **Slot conflict recheck**: POST /api/bookings returns 409 on overlap; IVR re-routes caller to pick a new time
+- Timestamp timezone bug fixed — bookings stored and read in correct Melbourne time
+- **Calendly service** (`calendlyService.js`): availability slots with Melbourne-timezone fallback generation
+- **n8n Workflows**: `quote-engine`, `quote-and-availability`, `create-booking`, `cancel-booking`, reminder workflows — JSON files ready to import
+- **Provider Dashboard**: Next.js app with bookings, call logs, services, settings pages
 
-### What is next (in order)
+### What is still missing (3 items)
 
-1. **Production Deployment**: Migrate n8n and Backend to permanent domains (out of ngrok)
-2. **Monitoring**: Set up error tracking (Sentry) and call analytics
-3. **AI Layer**: Integrate Ollama for smarter free-text parsing in Hindi/Mandarin
-4. **Chat Integration**: Add the optional web chat widget to the public pages
+1. **Calendly event creation** (3.32) — Calendly REST API does not support creating events programmatically; `calendarEventId` is always `null`. Not implementable without a different calendar provider.
+2. **Callback provider notification** (3.45) — No email or SMS is sent to the provider when a callback request is saved. Provider can see callbacks in the dashboard. Post-MVP.
+3. **Reschedule notification** (4.31) — No SMS/email sent to provider or customer when a booking is rescheduled via IVR. Post-MVP.

@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  turbopack: {
+    root: 'd:/aus-voice-ai/voice-ai/voice-ai/dashboard',
+  },
 };
 
 export default nextConfig;

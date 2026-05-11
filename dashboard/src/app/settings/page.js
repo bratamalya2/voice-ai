@@ -17,8 +17,8 @@ async function updateSettings(formData) {
   const timezone = formData.get("timezone");
 
   await query(
-    `UPDATE businesses 
-     SET business_name = $1, provider_email = $2, timezone = $3, updated_at = NOW()
+    `UPDATE businesses
+     SET business_name = $1, provider_email = $2, timezone = $3
      WHERE business_id = $4`,
     [name, email, timezone, id]
   );

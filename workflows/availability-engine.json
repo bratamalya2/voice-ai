@@ -3,94 +3,42 @@
   "nodes": [
     {
       "parameters": {
+        "httpMethod": "POST",
         "path": "availability-engine",
-        "authentication": "none",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "d3e8f9a1-2b3c-4d5e-6f7a-8b9c0d1e2f3a",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [250, 300]
+      "position": [240, 300]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "{{ $env.BACKEND_API_URL }}/api/availability",
-        "authentication": "none",
+        "url": "https://armhole-feeble-vixen.ngrok-free.dev/api/availability",
         "sendBody": true,
-        "bodyContentType": "application/json",
-        "body": "{\n  \"startDate\": \"{{ $json.startDate }}\",\n  \"endDate\": \"{{ $json.endDate }}\",\n  \"serviceDuration\": {{ $json.serviceDuration }}\n}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { startDate: ($json.body || $json).startDate, endDate: ($json.body || $json).endDate, serviceDuration: ($json.body || $json).serviceDuration } }}",
         "options": {}
       },
       "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
       "name": "Call Backend API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [450, 300],
-      "connections": {
-        "Webhook": [
-          [
-            {
-              "node": "Call Backend API",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    {
-      "parameters": {
-        "responseCode": 200,
-        "responseBody": "{{ $json }}",
-        "options": {}
-      },
-      "id": "f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u",
-      "name": "Respond to Webhook",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [650, 300],
-      "connections": {
-        "Call Backend API": [
-          [
-            {
-              "node": "Respond to Webhook",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
+      "position": [460, 300]
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Call Backend API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Call Backend API": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Call Backend API", "type": "main", "index": 0 }]]
     }
   },
   "active": false,
   "settings": {
-    "errorHandler": "STOP_ON_FIRST_ERROR"
+    "executionOrder": "v1"
   },
   "staticData": null,
   "pinData": null

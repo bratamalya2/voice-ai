@@ -7,7 +7,7 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "30 16 * * *"
+              "expression": "30 6 * * *"
             }
           ]
         }
@@ -36,7 +36,8 @@
       ],
       "credentials": {
         "postgres": {
-          "id": "your-postgres-credential-id"
+          "id": "v5Q3EhpU1Yq7cRLh",
+          "name": "voice-ai-postgres"
         }
       }
     },
@@ -55,7 +56,8 @@
       ],
       "credentials": {
         "postgres": {
-          "id": "your-postgres-credential-id"
+          "id": "v5Q3EhpU1Yq7cRLh",
+          "name": "voice-ai-postgres"
         }
       }
     },
@@ -90,7 +92,8 @@
       ],
       "credentials": {
         "smtp": {
-          "id": "your-smtp-credential-id"
+          "id": "Mm8QskUbgK1yAyrB",
+          "name": "voice-ai-smtp"
         }
       }
     }
